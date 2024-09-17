@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>example_nats_srv</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="NATS.Net" />
+        <PackageReference Include="NATS.Client.Serializers.Json" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\example-alib\example-alib.csproj" />
+    </ItemGroup>
+</Project>

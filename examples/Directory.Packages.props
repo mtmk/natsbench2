@@ -1,0 +1,22 @@
+﻿<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <NatsVersion>2.4.0</NatsVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Diagnostics.NETCore.Client" Version="0.2.510501" />
+    <PackageVersion Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.9" />
+    <PackageVersion Include="NATS.Net" Version="$(NatsVersion)" />
+    <PackageVersion Include="NATS.Client.Serializers.Json" Version="$(NatsVersion)" />
+    <PackageVersion Include="NATS.Client.ObjectStore" Version="$(NatsVersion)" />
+    <PackageVersion Include="NATS.Extensions.Microsoft.DependencyInjection" Version="$(NatsVersion)" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
+    <PackageVersion Include="System.IO.Pipelines" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+</Project>
