@@ -1,7 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <NatsVersion>2.4.0</NatsVersion>
+    <NatsVersion>2.5.0-preview.2</NatsVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Diagnostics.NETCore.Client" Version="0.2.510501" />

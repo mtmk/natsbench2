@@ -3,9 +3,11 @@ using System.Text;
 using example_alib;
 using NATS.Client.Core;
 using NATS.Client.JetStream;
+using NATS.Client.JetStream.Models;
 using NATS.Client.KeyValueStore;
 using NATS.Client.ObjectStore;
 using NATS.Client.Serializers.Json;
+using NATS.Net;
 
 var stopwatch = Stopwatch.StartNew();
 
@@ -139,6 +141,100 @@ Console.OutputEncoding = Encoding.UTF8;
         Console.WriteLine($"allocatedMb: {allocatedMb:n2} MB");
         GC.Collect();
     }
+}
+
+// client
+{
+    Console.WriteLine("________________________________");
+    Console.WriteLine("CLIENT");
+    
+    await using var nc = new NatsClient(Constants.Url);
+    
+    Console.WriteLine("Ping");
+    await nc.PingAsync();
+
+    Console.WriteLine("Sub");
+    bool sync = false;
+    var sub = Task.Run(async () =>
+    {
+        await foreach (var msg in nc.SubscribeAsync<ShopOrder>("data.json"))
+        {
+            if (msg.Data!.Id == -2)
+            {
+                sync = true;
+                continue;
+            }
+            
+            if (msg.Data!.Id == -1)
+            {
+                break;
+            }
+            
+            Console.WriteLine("[SUB] Received: " + msg);
+        }
+    });
+    
+    while (!sync)
+    {
+        await nc.PublishAsync("data.json", new ShopOrder(Id: -2));
+    }
+
+    Console.WriteLine("Pub");
+    await nc.PublishAsync("data.json", new ShopOrder(Id: 0));
+    await nc.PublishAsync("data.json", new ShopOrder(Id: 1));
+    await nc.PublishAsync("data.json", new ShopOrder(Id: 2));
+    await nc.PublishAsync("data.json", new ShopOrder(Id: -1));
+    await sub;
+
+    Console.WriteLine("JS");
+    var js = nc.CreateJetStreamContext();
+    try
+    {
+        await js.DeleteStreamAsync("DATA_STREAM");
+    }
+    catch (NatsJSApiException e)
+    {
+        if (e.Error.Code != 404)
+            throw;
+    }
+    await js.CreateStreamAsync(new StreamConfig("DATA_STREAM", ["data.*"]));
+
+    Console.WriteLine("KV");
+    var kv = nc.CreateKeyValueStoreContext();
+    try
+    {
+        await kv.DeleteStoreAsync("DATA_KV");
+    }
+    catch (NatsJSApiException e)
+    {
+        if (e.Error.Code != 404)
+            throw;
+    }
+    await kv.CreateStoreAsync("DATA_KV");
+
+    Console.WriteLine("OBJ");
+    var obj = nc.CreateObjectStoreContext();
+    try
+    {
+        await obj.DeleteObjectStore("DATA_OBJ", CancellationToken.None);
+    }
+    catch (NatsJSApiException e)
+    {
+        if (e.Error.Code != 404)
+            throw;
+    }
+    await obj.CreateObjectStoreAsync("DATA_OBJ");
+
+    Console.WriteLine("SVC");
+    var svc = nc.CreateServicesContext();
+    await using var svc1 = await svc.AddServiceAsync("svc1", "1.0.0");
+    await svc1.AddEndpointAsync<ShopOrder>(async m =>
+    {
+        await m.ReplyAsync($"OK {m.Data?.Id}");
+    }, "svc1.data.json");
+
+    var response = await nc.RequestAsync<ShopOrder, string>("svc1.data.json", new ShopOrder(Id: 42));
+    Console.WriteLine($"response: {response}");
 }
 
 Console.WriteLine("👋 BYE");
