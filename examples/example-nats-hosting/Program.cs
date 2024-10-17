@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using System.Text.Json.Serialization;
+using example_alib;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,8 +17,17 @@ var builder = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((_, services) =>
     {
-        services.AddNatsClient();
+        services.AddNatsClient(o =>
+        {
+            o.ConfigureOptions(c => c with
+            {
+                Url = Constants.Url,
+            });
+            o.AddJsonSerialization(MyJsonContext.Default);
+        });
         services.AddHostedService<MyService>();
+        services.AddHostedService<MyBackgroundService>();
+        services.AddHostedService<MyBackgroundPubService>();
     });
 
 using (var host = builder.Build())
@@ -34,6 +45,8 @@ using (var host = builder.Build())
         await nats.PublishAsync($"events.tick.{i}", $"Tick {DateTime.Now}");
     }
 
+    await Task.Delay(5000);
+    
     logger.LogInformation("Stopping...");
 
     await host.StopAsync();
@@ -92,4 +105,53 @@ class MyService(INatsConnection nats, ILogger<MyService> logger) : IHostedServic
         _task?.Dispose();
         logger.LogInformation("Disposed");
     }
+}
+
+class MyBackgroundPubService(INatsConnection nats, ILogger<MyBackgroundPubService> logger) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        logger.LogInformation("Starting..");
+
+        while (stoppingToken.IsCancellationRequested == false)
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                await Task.Delay(250, stoppingToken);
+                await nats.PublishAsync($"my.data.tick.{i}", new MyData { Id = i, Name = $"name{i}" },
+                    cancellationToken: stoppingToken);
+            }
+            await Task.Delay(5000, stoppingToken);
+        }
+
+        logger.LogInformation("Bye");
+    }
+}
+
+class MyBackgroundService(INatsConnection nats, ILogger<MyBackgroundService> logger) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        logger.LogInformation("Starting..");
+
+        await foreach (var msg in nats.SubscribeAsync<MyData>("my.data.>", cancellationToken: stoppingToken))
+        {
+            logger.LogInformation("Received {Subject}: {Data}", msg.Subject, msg.Data);
+        }
+
+        logger.LogInformation("Bye");
+    }
+}
+
+[JsonSerializable(typeof(MyData))]
+internal partial class MyJsonContext : JsonSerializerContext;
+
+public record MyData
+{
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+
+
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
 }
