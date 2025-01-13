@@ -26,9 +26,11 @@ var store = await obj.CreateObjectStoreAsync("test-obj-1");
 for (int i = 0; i < 3; i++)
 {
     Console.WriteLine("________________________________");
-    var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-    var file1 = Path.Combine(home, "Downloads", "big.bin");
-    var file2 = Path.Combine(home, "Downloads", "big-copy.bin");
+    // var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+    // var file1 = Path.Combine(home, "Downloads", "big.bin");
+    // var file2 = Path.Combine(home, "Downloads", "big-copy.bin");
+    var file1 = Path.Combine("d:", "tmp", "big.bin");
+    var file2 = Path.Combine("d:", "tmp", "big-copy.bin");
     File.Delete(file2);
 
     await store.PutAsync("k1", File.OpenRead(file1));
