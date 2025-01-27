@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "example-nats-obj", "example
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "example-nats-srv", "examples\example-nats-srv\example-nats-srv.csproj", "{A43056BF-515E-4D0B-8F32-ED97543D4221}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "msgserver", "msgserver\msgserver.csproj", "{136E8ED2-EDD2-409D-9B4D-8ECFB6B196D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{A43056BF-515E-4D0B-8F32-ED97543D4221}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A43056BF-515E-4D0B-8F32-ED97543D4221}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A43056BF-515E-4D0B-8F32-ED97543D4221}.Release|Any CPU.Build.0 = Release|Any CPU
+		{136E8ED2-EDD2-409D-9B4D-8ECFB6B196D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{136E8ED2-EDD2-409D-9B4D-8ECFB6B196D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{136E8ED2-EDD2-409D-9B4D-8ECFB6B196D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{136E8ED2-EDD2-409D-9B4D-8ECFB6B196D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A7D555A8-71D4-4494-9922-992A97D8B937} = {8BCD20ED-7DA8-4C1F-B70C-B2B4DDEF3320}
